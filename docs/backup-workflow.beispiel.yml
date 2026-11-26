@@ -1,0 +1,39 @@
+# Beispiel, absichtlich nicht aktiv (liegt nicht in .github/workflows).
+# NUR in einem PRIVATEN Repository benutzen: In öffentlichen Repos können andere angemeldete GitHub-Nutzer
+# die Artefakte, also das komplette Datenbank-Backup, herunterladen.
+name: Datenbank-Backup
+on:
+  schedule:
+    - cron: "15 3 * * 0"   # jeden Sonntag um 03:15 UTC
+  workflow_dispatch:        # zusätzlich per Knopf startbar (Actions -> Datenbank-Backup -> Run workflow)
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Aktuellen PostgreSQL-Client installieren
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          . /etc/os-release
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt ${VERSION_CODENAME}-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-17
+      - name: Datenbank sichern
+        env:
+          PGPASSWORD: ${{ secrets.DB_PASSWORD }}
+          PGSSLMODE: require
+        run: |
+          DATEI="pokemon_backup_$(date +%Y-%m-%d).sql.gz"
+          /usr/lib/postgresql/17/bin/pg_dump \
+            --host="${{ secrets.DB_HOST }}" --port=5432 --username="${{ secrets.DB_USER }}" --dbname=postgres \
+            --schema=public --no-owner --no-privileges | gzip > "$DATEI"
+          GROESSE=$(stat -c %s "$DATEI")
+          echo "Backup $DATEI: $GROESSE Bytes"
+          if [ "$GROESSE" -lt 5000 ]; then echo "Backup auffällig klein, Abbruch"; exit 1; fi
+          echo "DATEI=$DATEI" >> "$GITHUB_ENV"
+      - name: Backup als Download speichern (90 Tage)
+        uses: actions/upload-artifact@v4
+        with:
+          name: pokemon-backup
+          path: ${{ env.DATEI }}
+          retention-days: 90

@@ -1,0 +1,17 @@
+# Zugangsdaten
+.streamlit/secrets.toml
+.env
+
+# Datensicherungen und eigene Daten
+*.dump
+*.sql.gz
+*.zip
+dump-*.sql
+*.xlsx
+*.csv
+
+# Eigene Bilder (Urheberrecht / privat)
+Bilder/
+
+__pycache__/
+*.pyc
