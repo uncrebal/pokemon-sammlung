@@ -166,7 +166,7 @@ def karten_der_sammlung(suche=""):
     if suche and suche.strip():
         df = df[df["name"].str.contains(suche.strip(), case=False, regex=False, na=False)].reset_index(drop=True)
     df["preis"] = pd.to_numeric(df["preis"])
-    df["wert"] = df["preis"] * df["anzahl"]
+    df["wert"] = (df["preis"] * df["anzahl"]).astype(float)   # auch bei leerer Sammlung eine Zahlenspalte
     return df
 
 
@@ -175,7 +175,7 @@ def produkte_der_sammlung():
     df = run(PRODUKTE_SQL)
     for spalte in ("preis", "kaufpreis", "uvp"):
         df[spalte] = pd.to_numeric(df[spalte])
-    df["wert"] = df["preis"] * df["anzahl"]
+    df["wert"] = (df["preis"] * df["anzahl"]).astype(float)   # auch bei leerer Sammlung eine Zahlenspalte
     return df
 
 
