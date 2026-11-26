@@ -37,8 +37,11 @@ flowchart LR
 | `design.py`, `bausteine.py` | Aussehen und gemeinsame Bausteine |
 | `ansichten/` | eine Datei pro Menüpunkt |
 | `datenbank/schema.sql` | Tabellen, Schlüssel und Indizes |
+| `datenbank/abfragen.sql` | kommentierte Beispielabfragen |
 
 ## Datenbank
+Ausführlich mit ER-Diagramm, Entwurfsentscheidungen und Beispielabfragen: **[docs/datenbank.md](docs/datenbank.md)**
+
 - Stammdaten (`sets`, `karten`, `produkte`) sind vom Besitz (`sammlung_karten`, `sammlung_produkte`) getrennt.
 - Der Preisverlauf liegt in `preis_karten` und `preis_produkte`, ein Eintrag pro Tag.
 - Der neueste Preis wird per `LEFT JOIN LATERAL` gelesen, Aktualisierungen laufen über `ON CONFLICT`.
