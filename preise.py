@@ -16,7 +16,7 @@ def lade_preisliste(url=PREIS_URL):
 
 
 def aktualisiere_preise(conn, daten):
-    """Schreibt die Preise zu euren Karten und Produkten in die Datenbank.
+    """Schreibt die Preise zu den Karten und Produkten der Sammlung in die Datenbank.
     daten = Inhalt von price_guide_6.json (Dict). Gibt (Stand, Anzahl Karten, Anzahl Produkte) zurück."""
     stand = date.fromisoformat(daten["createdAt"][:10])
     preise = {p["idProduct"]: p for p in daten["priceGuides"]}
