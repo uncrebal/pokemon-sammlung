@@ -7,7 +7,11 @@ am Handy.
 
 **Zur Entstehung:** Den Python-Code hat größtenteils ein KI-Assistent (Claude) geschrieben. Ich habe festgelegt,
 was die App können soll, sie im Alltag getestet und mit der Datenbank in DBeaver gearbeitet. Mich interessiert vor
-allem der Datenbank-Teil, der ist hier ausführlicher beschrieben: [docs/datenbank.md](docs/datenbank.md).
+allem der Datenbank-Teil.
+
+Ausführlicher:
+- [Dokumentation](docs/dokumentation.md): Bedienung, Datenquellen, Preise und Betrieb
+- [Datenbank](docs/datenbank.md): Datenmodell, Entwurfsentscheidungen und Beispielabfragen
 
 ## Was die App kann
 - Gesamtwert, Gewinn oder Verlust bei Produkten und ein Wertverlauf (Beträge lassen sich ausblenden)
