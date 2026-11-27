@@ -1,19 +1,21 @@
 # Pokémon-Sammlung
 
-Web-App, mit der ich eine Sammlung aus Pokémon-Karten und versiegelten Produkten verwalte: Bestand, Preise,
-Wertverlauf und Vollständigkeit der Sets. Sie läuft am PC und am Handy.
+Ich sammle Pokémon-Karten und versiegelte Produkte. Irgendwann war die Excel-Liste zu
+unübersichtlich, also gibt es jetzt diese Web-App. Sie zeigt, was ich habe, was es ungefähr wert ist und welche
+Karten in einem Set noch fehlen. Die Preise kommen jeden Tag automatisch dazu. Die App läuft im Browser am PC und
+am Handy.
 
-> **Entstehung:** Die App ist mit Unterstützung eines KI-Assistenten (Claude) entstanden. Ich nutze sie als
-> Lernprojekt während meiner Umschulung zum Fachinformatiker für Digitale Vernetzung.
+**Zur Entstehung:** Den Python-Code hat größtenteils ein KI-Assistent (Claude) geschrieben. Ich habe festgelegt,
+was die App können soll, sie im Alltag getestet und mit der Datenbank in DBeaver gearbeitet. Mich interessiert vor
+allem der Datenbank-Teil, der ist hier ausführlicher beschrieben: [docs/datenbank.md](docs/datenbank.md).
 
-## Funktionen
-- Übersicht mit Gesamtwert, Gewinn/Verlust bei Produkten und Wertverlauf (Beträge lassen sich ausblenden)
-- Karten und versiegelte Produkte erfassen, einzeln oder mehrere auf einmal
-- Suche über Sammlung und Kartenkatalog
-- Anzeige, welche Karten eines Sets noch fehlen
+## Was die App kann
+- Gesamtwert, Gewinn oder Verlust bei Produkten und ein Wertverlauf (Beträge lassen sich ausblenden)
+- Karten und Produkte eintragen, auch mehrere auf einmal
+- Suche über die Sammlung und einen Kartenkatalog
+- Anzeige, was in einem Set noch fehlt
 - Preise aus der öffentlichen Preisliste von Cardmarket, bei Bedarf eigene Preise
 - Export als Excel-Datei
-- Eigene Ansicht fürs Handy
 
 ## Aufbau
 
@@ -25,34 +27,23 @@ flowchart LR
     B -->|Kartenbilder| T[Externe Bildquellen, z. B. TCGdex]
 ```
 
-**Technik:** Python, Streamlit, PostgreSQL, pandas, Altair
+Technik: Python, Streamlit, PostgreSQL, pandas
 
 | Datei | Aufgabe |
 |---|---|
-| `app.py` | Startdatei: Seitenaufbau, Menü, globale Suche |
-| `db.py` | Verbindungspool, Abfragen mit Zwischenspeicher, Transaktionen |
+| `app.py` | Startdatei mit Menü und Suche |
+| `db.py` | Verbindung zur Datenbank, Lesen und Schreiben |
 | `katalog.py`, `produktkatalog.py` | Karten- und Produktsuche |
 | `preise.py` | Preisliste laden und speichern |
-| `bilder.py` | Bildadressen und Vorschaubilder |
-| `design.py`, `bausteine.py` | Aussehen und gemeinsame Bausteine |
 | `ansichten/` | eine Datei pro Menüpunkt |
-| `datenbank/schema.sql` | Tabellen, Schlüssel und Indizes |
-| `datenbank/abfragen.sql` | kommentierte Beispielabfragen |
+| `datenbank/schema.sql` | Tabellen, Schlüssel, Indizes |
+| `datenbank/abfragen.sql` | ein paar kommentierte Beispielabfragen |
 
-## Datenbank
-Ausführlich mit ER-Diagramm, Entwurfsentscheidungen und Beispielabfragen: **[docs/datenbank.md](docs/datenbank.md)**
-
-- Stammdaten (`sets`, `karten`, `produkte`) sind vom Besitz (`sammlung_karten`, `sammlung_produkte`) getrennt.
-- Der Preisverlauf liegt in `preis_karten` und `preis_produkte`, ein Eintrag pro Tag.
-- Der neueste Preis wird per `LEFT JOIN LATERAL` gelesen, Aktualisierungen laufen über `ON CONFLICT`.
-- Row Level Security ist für die Sammlungs- und Katalogtabellen eingeschaltet. Damit sind sie über die
-  Web-Schnittstelle von Supabase gesperrt. Die App verbindet sich direkt mit der Datenbank.
-
-## Starten
-Voraussetzungen: Python 3.11 oder neuer und eine leere PostgreSQL-Datenbank.
+## Selbst starten
+Man braucht Python 3.11 oder neuer und eine leere PostgreSQL-Datenbank.
 
 1. `datenbank/schema.sql` in der Datenbank ausführen.
-2. `.streamlit/secrets.toml.example` als `.streamlit/secrets.toml` kopieren und die eigenen Zugangsdaten eintragen.
+2. `.streamlit/secrets.toml.example` nach `.streamlit/secrets.toml` kopieren und die eigenen Zugangsdaten eintragen.
 3. Pakete installieren und starten:
 
 ```
@@ -60,14 +51,13 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-Die Datenbank ist am Anfang leer. Der Kartenkatalog und meine Sammlung sind nicht Teil des Repositorys.
+Die Datenbank ist danach leer. Meine Sammlung und der Kartenkatalog sind nicht im Repository.
 
-## Sicherheit und Grenzen
-- Zugangsdaten stehen nur in `secrets.toml` bzw. in den Secrets der Hosting-Plattform, nie im Code.
-- Die App hat **keine eigene Anmeldung**. Sie sollte nur privat oder hinter einem Zugriffsschutz laufen.
-- Bei einem Verbindungsfehler zeigt die App die Fehlermeldung der Datenbank an.
-- Ein Beispiel für ein wöchentliches Backup liegt in `docs/backup-workflow.beispiel.yml` (nur für private Repositorys).
+## Gut zu wissen
+- Die Zugangsdaten stehen nie im Code, nur in `secrets.toml` bzw. bei der Hosting-Plattform.
+- Die App hat keine eigene Anmeldung. Sie läuft bei mir als private App und sollte nicht offen im Internet stehen.
+- Ein Beispiel für ein wöchentliches Datenbank-Backup mit GitHub Actions liegt in
+  `docs/backup-workflow.beispiel.yml`. Das gehört nur in ein privates Repository.
 
-## Hinweis
-Privates, nicht kommerzielles Projekt. Es steht in keiner Verbindung zu Nintendo, The Pokémon Company oder
-Cardmarket. Pokémon ist eine Marke der jeweiligen Rechteinhaber. Das Repository enthält keine Kartenbilder.
+Privates Hobbyprojekt ohne Verbindung zu Nintendo, The Pokémon Company oder Cardmarket. Es sind keine Kartenbilder
+enthalten.
